@@ -8,15 +8,17 @@ from sys import argv, exit
     - Por: Alexya Ungaratti, Gabriela Guarani da Silva e Maria Rita Rodrigues
 '''
 
-# Caminho do arquivo (teste)
-caminho_arquivo = "./casos/casod30.txt"
-
 def leitura(caminho_arquivo):
-#    print("lendo o arquivo...")
-    with open(caminho_arquivo) as arquivo:
-        texto = arquivo.readlines() # lendo todas as linhas
-        
-    return remover_linhas_vazias(texto)
+    try:
+        with open(caminho_arquivo) as arquivo:
+            texto = arquivo.readlines()  # lendo todas as linhas
+        return remover_linhas_vazias(texto)
+    except FileNotFoundError:
+        print(f"Erro: O arquivo '{caminho_arquivo}' não foi encontrado.")
+        exit(1)
+    except IOError:
+        print(f"Erro: Não foi possível ler o arquivo '{caminho_arquivo}'.")
+        exit(1)
 
 def remover_linhas_vazias(texto):
     # removendo linhas vazias e espaços em branco das linhas
@@ -26,7 +28,6 @@ def remover_linhas_vazias(texto):
     -------- MATRIZ --------
 '''
 def construir_matriz(texto):
-#    print("construindo a matriz...")
     matriz = []
     
     for linha in texto:
@@ -39,7 +40,7 @@ def construir_matriz(texto):
     return matriz
 
 def imprimir_matriz(matriz, simbolo_atual = None, posicao = None):
-    os.system('cls' if os.name == 'nt' else 'clear')  # limapndo o terminal a cada vez que a matriz é impressa (win e linux)
+    os.system('cls' if os.name == 'nt' else 'clear')  # limpando o terminal a cada vez que a matriz é impressa (win e linux)
     for i, linha in enumerate(matriz):
         for j, caractere in enumerate(linha):
             if simbolo_atual and posicao == (i, j):
@@ -61,7 +62,6 @@ def encontrar_raiz(matriz):
 '''
 
 def galhos(matriz, linha, coluna, direcao):
-#    print("caminhando na matriz...")
     total = 0
     pilha = []
 
@@ -115,6 +115,7 @@ def galhos(matriz, linha, coluna, direcao):
             coluna -= 1
         elif direcao == "direita":
             coluna += 1
+            
     return total, pilha
 
 def caminhar(matriz, raizCol):
@@ -125,11 +126,16 @@ def caminhar(matriz, raizCol):
     return caminho
 
 '''
-    -------- TESTES --------
+    -------- MAIN --------
 '''
-texto = leitura(caminho_arquivo)
-matriz = construir_matriz(texto)
-imprimir_matriz(matriz)
-raizCol = encontrar_raiz(matriz)
-
-caminhar(matriz, raizCol)
+if __name__ == "__main__":
+    if len(argv) != 2:
+        print("Digite: python frutinhasMalditas.py caminho_do_caso")
+        exit(1)
+    
+    caminho_arquivo = argv[1]
+    texto = leitura(caminho_arquivo)
+    matriz = construir_matriz(texto)
+    imprimir_matriz(matriz)
+    raizCol = encontrar_raiz(matriz)
+    caminhar(matriz, raizCol)
