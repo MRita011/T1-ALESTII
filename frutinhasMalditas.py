@@ -130,7 +130,7 @@ def caminhar(matriz, raizCol):
 '''
 if __name__ == "__main__":
     if len(argv) != 2:
-        print("Digite: python frutinhasMalditas.py caminho_do_caso")
+        print("Digite: python frutinhasMalditas.py ./casos/nomeDoCaso.txt")
         exit(1)
     
     caminho_arquivo = argv[1]
