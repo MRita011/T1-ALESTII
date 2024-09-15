@@ -1,22 +1,27 @@
 # imports
+import matplotlib.pyplot as plt
+import numpy as np
+
+from sys import argv, exit
 import time
 import os
-from sys import argv, exit
 
 '''
     - Algoritmos e Estruturas de Dados II: Trabalho 1
     - Por: Alexya Ungaratti, Gabriela Guarani da Silva e Maria Rita Rodrigues
 '''
 
-# Caminho do arquivo (teste)
-caminho_arquivo = "./casos/casod30.txt"
-
 def leitura(caminho_arquivo):
-#    print("lendo o arquivo...")
-    with open(caminho_arquivo) as arquivo:
-        texto = arquivo.readlines() # lendo todas as linhas
-        
-    return remover_linhas_vazias(texto)
+    try:
+        with open(caminho_arquivo) as arquivo:
+            texto = arquivo.readlines()  # lendo todas as linhas
+        return remover_linhas_vazias(texto)
+    except FileNotFoundError:
+        print(f"Erro: O arquivo '{caminho_arquivo}' não foi encontrado.")
+        exit(1)
+    except IOError:
+        print(f"Erro: Não foi possível ler o arquivo '{caminho_arquivo}'.")
+        exit(1)
 
 def remover_linhas_vazias(texto):
     # removendo linhas vazias e espaços em branco das linhas
@@ -26,20 +31,19 @@ def remover_linhas_vazias(texto):
     -------- MATRIZ --------
 '''
 def construir_matriz(texto):
-#    print("construindo a matriz...")
     matriz = []
     
     for linha in texto:
         fila_char = []
         for caractere in linha:
-            fila_char.append(caractere) # adicionando cada caractere do texto à fila
-        matriz.append(fila_char) # adicionando a fila à matriz
+            fila_char.append(caractere)  # adicionando cada caractere do texto à fila
+        matriz.append(fila_char)  # adicionando a fila à matriz
         
     print("matriz criada com sucesso!...\n")
     return matriz
 
-def imprimir_matriz(matriz, simbolo_atual = None, posicao = None):
-    os.system('cls' if os.name == 'nt' else 'clear')  # limapndo o terminal a cada vez que a matriz é impressa (win e linux)
+def imprimir_matriz(matriz, simbolo_atual=None, posicao=None):
+    os.system('cls' if os.name == 'nt' else 'clear')  # limpando o terminal a cada vez que a matriz é impressa (win e linux)
     for i, linha in enumerate(matriz):
         for j, caractere in enumerate(linha):
             if simbolo_atual and posicao == (i, j):
@@ -50,7 +54,7 @@ def imprimir_matriz(matriz, simbolo_atual = None, posicao = None):
     time.sleep(0.05)  # tempo de impressão
 
 def encontrar_raiz(matriz):
-    ultima_linha = matriz[-1] # pegamos a última linha da matriz
+    ultima_linha = matriz[-1]  # pegamos a última linha da matriz
     for coluna, caractere in enumerate(ultima_linha):
         if caractere != ' ':  # vemos se o caractere não é um espaço vazio
             return coluna  # retornamos a coluna em que a raiz foi encontrada
@@ -61,7 +65,6 @@ def encontrar_raiz(matriz):
 '''
 
 def galhos(matriz, linha, coluna, direcao):
-#    print("caminhando na matriz...")
     total = 0
     pilha = []
 
@@ -70,7 +73,7 @@ def galhos(matriz, linha, coluna, direcao):
         pilha.append((caractere, linha, coluna))
         
         # imprimindo o símbolo atual e posição
-        imprimir_matriz(matriz, simbolo_atual = caractere, posicao = (linha, coluna))
+        imprimir_matriz(matriz, simbolo_atual=caractere, posicao=(linha, coluna))
 
         # se encontrar um nodo folha
         if caractere == '#':
@@ -115,6 +118,7 @@ def galhos(matriz, linha, coluna, direcao):
             coluna -= 1
         elif direcao == "direita":
             coluna += 1
+            
     return total, pilha
 
 def caminhar(matriz, raizCol):
@@ -124,12 +128,50 @@ def caminhar(matriz, raizCol):
     print(f"Pontuação do melhor caminho: {total}")
     return caminho
 
-'''
-    -------- TESTES --------
-'''
-texto = leitura(caminho_arquivo)
-matriz = construir_matriz(texto)
-imprimir_matriz(matriz)
-raizCol = encontrar_raiz(matriz)
 
-caminhar(matriz, raizCol)
+'''
+    -------- ARQUIVOS --------
+'''
+if __name__ == "__main__":
+    if len(argv) != 2:
+        print("Digite: python frutinhasMalditas.py ./casos/nomeDoCaso.txt")
+        exit(1)
+    
+    caminho_arquivo = argv[1]
+    texto = leitura(caminho_arquivo)
+    matriz = construir_matriz(texto)
+    imprimir_matriz(matriz)
+    raizCol = encontrar_raiz(matriz)
+    caminhar(matriz, raizCol)
+
+'''
+    -------- PLOTTANDO --------
+
+# a gente copiou o exemplo do notebook na caruda #
+
+x = []
+y = []
+
+# Função exemplo (substitua caminhar pela função que deseja medir)
+def caminhar(n):
+    global op
+    op = n ** 2
+
+# Coleta de dados
+for n in range(1, 31):
+    op = 0
+    caminhar(n)
+    x.append(n)
+    y.append(op)
+
+# Configurações do gráfico
+plt.style.use('fivethirtyeight')
+plt.plot(x, y, 'r-', label="Operações")
+plt.yscale("log")
+plt.xlabel("Tamanho da entrada (n)")
+plt.ylabel("Número de operações")
+plt.title("Complexidade do Algoritmo")
+plt.legend()
+plt.grid(True)
+plt.show()
+'''
