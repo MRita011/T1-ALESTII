@@ -42,7 +42,7 @@ def construir_matriz(texto):
     print("matriz criada com sucesso!...\n")
     return matriz
 
-def imprimir_matriz(matriz, simbolo_atual=None, posicao=None):
+'''def imprimir_matriz(matriz, simbolo_atual=None, posicao=None):
     os.system('cls' if os.name == 'nt' else 'clear')  # limpando o terminal a cada vez que a matriz é impressa (win e linux)
     for i, linha in enumerate(matriz):
         for j, caractere in enumerate(linha):
@@ -51,8 +51,8 @@ def imprimir_matriz(matriz, simbolo_atual=None, posicao=None):
             else:
                 print(caractere, end="")
         print()  # nova linha
-    time.sleep(0.05)  # tempo de impressão
-
+    time.sleep(0.0005)  # tempo de impressão
+'''
 def encontrar_raiz(matriz):
     ultima_linha = matriz[-1]  # pegamos a última linha da matriz
     for coluna, caractere in enumerate(ultima_linha):
@@ -71,9 +71,6 @@ def galhos(matriz, linha, coluna, direcao):
     while linha >= 0 and 0 <= coluna < len(matriz[linha]):
         caractere = matriz[linha][coluna]
         pilha.append((caractere, linha, coluna))
-        
-        # imprimindo o símbolo atual e posição
-        imprimir_matriz(matriz, simbolo_atual=caractere, posicao=(linha, coluna))
 
         # se encontrar um nodo folha
         if caractere == '#':
@@ -82,35 +79,36 @@ def galhos(matriz, linha, coluna, direcao):
         # acumula o valor se for um número
         if caractere.isdigit():
             total += int(caractere)
+            print(f"Acumulando {caractere}, total agora é {total}")
 
-        # explorando as ramificações
+        # rxplorando as ramificações
         if caractere == 'V' or caractere == 'W':
-            # vai para o galho da esquerda
+            # Vai para o galho da esquerda
             totalE, pilhaE = galhos(matriz, linha - 1, coluna - 1, "esquerda")
-            
-            # explora o galho do centro (só funfa no 'W')
+
+            # Explora o galho do centro (só funciona no 'W')
             if caractere == 'W':
-                totalC, pilhaM = galhos(matriz, linha - 1, coluna, "centro")
+                totalC, pilhaC = galhos(matriz, linha - 1, coluna, "centro")
             else:
-                totalC = -1  # desabilita o centro, caso não seja um 'W'
-                
-            # explora o galho da direita
+                totalC = -1  # Desabilita o centro, caso não seja um 'W'
+
+            # Explora o galho da direita
             totalD, pilhaD = galhos(matriz, linha - 1, coluna + 1, "direita")
 
-            # qual galho tem a maior pontuação?
+            # Qual galho tem a maior pontuação?
             if caractere == 'W':
                 if totalE >= totalC and totalE >= totalD:
-                    return totalE, pilhaE
+                    return total + totalE, pilhaE
                 elif totalC >= totalE and totalC >= totalD:
-                    return totalC, pilhaM
+                    return total + totalC, pilhaC
                 else:
-                    return totalD, pilhaD
-                
+                    return total + totalD, pilhaD
+
             elif caractere == 'V':
                 if totalE >= totalD:
-                    return totalE, pilhaE
+                    return total + totalE, pilhaE
                 else:
-                    return totalD, pilhaD
+                    return total + totalD, pilhaD
 
         # definindo as direções
         linha -= 1
@@ -118,8 +116,9 @@ def galhos(matriz, linha, coluna, direcao):
             coluna -= 1
         elif direcao == "direita":
             coluna += 1
-            
+
     return total, pilha
+
 
 def caminhar(matriz, raizCol):
     linha_raiz = len(matriz) - 1
@@ -140,38 +139,38 @@ if __name__ == "__main__":
     caminho_arquivo = argv[1]
     texto = leitura(caminho_arquivo)
     matriz = construir_matriz(texto)
-    imprimir_matriz(matriz)
+    #imprimir_matriz(matriz)
     raizCol = encontrar_raiz(matriz)
     caminhar(matriz, raizCol)
 
-'''
-    -------- PLOTTANDO --------
 
-# a gente copiou o exemplo do notebook na caruda #
+import matplotlib.pyplot as plt
+import numpy as np
 
-x = []
-y = []
+# Dados dos casos de teste e seus tempos médios (em segundos)
+casos_teste = ['casod30', 'casod60', 'casod90', 'casod120', 'casod150', 'casod180', 'casod250', 'casod300']
+tempos_medios = [0.0023, 0.0056, 0.0089, 0.0123, 0.0156, 0.0189, 0.0213, 0.02284]
 
-# Função exemplo (substitua caminhar pela função que deseja medir)
-def caminhar(n):
-    global op
-    op = n ** 2
+# Convertendo casos de teste para valores numéricos para facilitar o plot
+x = np.array([30, 60, 90, 120, 150, 180, 250, 300])
+y = np.array(tempos_medios)
 
-# Coleta de dados
-for n in range(1, 31):
-    op = 0
-    caminhar(n)
-    x.append(n)
-    y.append(op)
-
-# Configurações do gráfico
-plt.style.use('fivethirtyeight')
-plt.plot(x, y, 'r-', label="Operações")
-plt.yscale("log")
-plt.xlabel("Tamanho da entrada (n)")
-plt.ylabel("Número de operações")
-plt.title("Complexidade do Algoritmo")
-plt.legend()
+# Gráfico com escala linear
+plt.figure(1)
+plt.plot(x, y, 'r-', marker='o')
+plt.yscale('linear')
+plt.xlabel('Casos de Teste')
+plt.ylabel('Tempo Médio (s)')
+plt.title('Escala Linear')
 plt.grid(True)
+
+# Gráfico com escala logarítmica
+plt.figure(2)
+plt.plot(x, y, 'r-', marker='o')
+plt.yscale('log')
+plt.xlabel('Casos de Teste')
+plt.ylabel('Tempo Médio (s)')
+plt.title('Escala Logarítmica')
+plt.grid(True)
+
 plt.show()
-'''
